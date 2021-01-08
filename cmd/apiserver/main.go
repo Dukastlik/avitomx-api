@@ -1,32 +1,26 @@
 package main
 
 import (
-	"log"
 	"flag"
-	"github.com/Dukastlik/avitomx-api.git/internal/app/apiserver"
+	"log"
 
+	"github.com/BurntSushi/toml"
+	"github.com/Dukastlik/avitomx-api.git/internal/app/apiserver"
 )
 
+var configPath string
 
-var {
-	configPath string
-}
-
-
-func init()  {
+func init() {
 	flag.StringVar(&configPath, "config-path", "configs/apiserver.toml", "path to config file")
 }
 
-
-
-func main()  {
+func main() {
 	flag.Parse()
 	config := apiserver.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	s := apiserver.New(config)
 	if err := s.Start(); err != nil {
 		log.Fatal(err)

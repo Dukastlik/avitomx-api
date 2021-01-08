@@ -1,12 +1,15 @@
 package apiserver
 
-
-type Config struct{
+// Config ...
+type Config struct {
 	BindAddr string `toml:"bind_addr"`
+	LogLevel string `toml: "log_level"`
 }
 
+// NewConfig ...
 func NewConfig() *Config {
 	return &Config{
-		BindAddr: "0.0.0.0:8080",
+		BindAddr: ":8080",
+		LogLevel: "debug",
 	}
 }
