@@ -3,15 +3,17 @@ package apiserver
 import (
 	"net/http"
 
+	"github.com/Dukastlik/avitomx-api.git/internal/app/products"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
 // APIServer Structure
 type APIServer struct {
-	config *Config
-	logger *logrus.Logger
-	router *mux.Router
+	config   *Config
+	logger   *logrus.Logger
+	router   *mux.Router
+	products *products.Products
 }
 
 // New APIServer
@@ -29,7 +31,13 @@ func (s *APIServer) Start() error {
 		return err
 	}
 	s.configureRouter()
+
+	if err := s.configureProducts(); err != nil {
+		return err
+	}
+
 	s.logger.Info("Starting server")
+
 	return http.ListenAndServe(s.config.BindAddr, s.router)
 }
 
@@ -40,5 +48,15 @@ func (s *APIServer) configureLogger() error {
 		return err
 	}
 	s.logger.SetLevel(level)
+	return nil
+}
+
+// configureProducts
+func (s *APIServer) configureProducts() error {
+	pr := products.New(s.config.Products)
+	if err := pr.Open(); err != nil {
+		return err
+	}
+	s.products = pr
 	return nil
 }

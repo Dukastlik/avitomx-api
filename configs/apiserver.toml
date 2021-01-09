@@ -1,2 +1,5 @@
 bind_addr = ":8080"
 lo_level = "debug"
+
+[products]
+database_url = "host=localhost dbname=avito_products sslmode=disable"
