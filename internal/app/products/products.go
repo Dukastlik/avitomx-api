@@ -54,4 +54,4 @@ func (p *Products) Product() *ProductRepository {
 	return p.prodRepo
 }
 
-//products.product.Create
+//products.Product.Create

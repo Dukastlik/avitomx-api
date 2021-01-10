@@ -1,28 +1,63 @@
 package apiserver
 
 import (
-	"io"
+	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/Dukastlik/avitomx-api.git/internal/app/model"
 )
 
 func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/add", s.handleAdd()) // TODO POST request
+	s.router.HandleFunc("/add", s.handleAdd()).Methods("POST")
+	s.router.HandleFunc("/stat", s.handleStat()).Methods("GET")
 }
 
 func (s *APIServer) handleAdd() http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		adreq, err := parseRequest(r)
+		addreq, err := parseAddRequest(r)
 		if err != nil {
-			//fmt.Println(err)
-			return // TODO ??
+			http.Error(w, "Invalid data proceeded", http.StatusBadRequest)
+			return
 		}
-		go AddFile(adreq)
-		vars := mux.Vars(r)
-		link := vars["link"]
-		io.WriteString(w, link)
+
+		respStruct, err := AddFile(addreq, s)
+		if err != nil {
+			http.Error(w, "Invalid file proceeded", http.StatusBadRequest)
+			return
+		}
+
+		js, err := respStruct.ToJson()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
+	}
+}
+
+func (s *APIServer) handleStat() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		statreq, err := model.ParseStatRequest(r)
+		if err != nil {
+			http.Error(w, "Invalid data proceeded", http.StatusBadRequest)
+			return
+		}
+		products, err := GetStat(statreq, s)
+		if err != nil {
+			http.Error(w, "Invalid data proceeded", http.StatusBadRequest)
+			return
+		}
+		js, err := json.Marshal(products)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
 	}
 }
