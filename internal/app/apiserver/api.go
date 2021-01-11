@@ -76,9 +76,6 @@ func AddFile(a *AddRequest, s *APIServer) (*AddResponse, error) {
 }
 
 func GetStat(st *model.StatRequest, s *APIServer) ([]model.Product, error) {
-	fmt.Println("merch id : ", st.MerchID)
-	fmt.Println("offer id : ", st.OfferID)
-	fmt.Println("name: ", st.ProdName)
 
 	products, err := s.products.Product().Read(st)
 	if err != nil {
