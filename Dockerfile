@@ -12,7 +12,7 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-CMD make
+RUN make
 
 EXPOSE 8080
 RUN ls
